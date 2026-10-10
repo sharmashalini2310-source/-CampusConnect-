@@ -1,0 +1,23 @@
+{
+  "info": {
+    "name": "CampusConnect REST API",
+    "description": "Test CampusConnect registration, login, items CRUD and health endpoint. Run the server at http://localhost:5000 first.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:5000"},
+    {"key": "token", "value": ""},
+    {"key": "itemId", "value": ""}
+  ],
+  "item": [
+    {"name": "Health - Check API and MongoDB", "request": {"method": "GET", "url": "{{baseUrl}}/api/health"}},
+    {"name": "Register", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"name\": \"Demo Student\",\n  \"email\": \"demo.student@example.com\",\n  \"password\": \"Campus123\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{baseUrl}}/api/auth/register"}, "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["if (pm.response.code === 201 || pm.response.code === 200) {", "  const data = pm.response.json();", "  if (data.token) pm.collectionVariables.set('token', data.token);", "}"]}}]},
+    {"name": "Login", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"email\": \"demo.student@example.com\",\n  \"password\": \"Campus123\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{baseUrl}}/api/auth/login"}, "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["if (pm.response.code === 200) {", "  const data = pm.response.json();", "  if (data.token) pm.collectionVariables.set('token', data.token);", "}"]}}]},
+    {"name": "Get Current User (requires token)", "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": "{{baseUrl}}/api/auth/me"}},
+    {"name": "List All Items", "request": {"method": "GET", "url": "{{baseUrl}}/api/items"}},
+    {"name": "Create Item (requires token)", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\n  \"title\": \"Blue Water Bottle\",\n  \"description\": \"Blue bottle found near the library entrance.\",\n  \"category\": \"Other\",\n  \"type\": \"found\",\n  \"location\": \"College Library\",\n  \"date\": \"2026-10-10\",\n  \"imageUrl\": \"\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{baseUrl}}/api/items"}, "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["if (pm.response.code === 201) {", "  const data = pm.response.json();", "  if (data.item && data.item._id) pm.collectionVariables.set('itemId', data.item._id);", "}"]}}]},
+    {"name": "My Items (requires token)", "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": "{{baseUrl}}/api/items/mine"}},
+    {"name": "Update Item Status (requires token)", "request": {"method": "PATCH", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\n  \"status\": \"returned\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{baseUrl}}/api/items/{{itemId}}"}},
+    {"name": "Delete Item (requires token)", "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": "{{baseUrl}}/api/items/{{itemId}}"}}
+  ]
+}
